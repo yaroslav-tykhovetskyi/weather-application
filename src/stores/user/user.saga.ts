@@ -8,10 +8,7 @@ export function* fetchUserSaga(): Generator<unknown, UserResponse | null> {
   try {
     yield put(setIsUserLoading(true));
 
-    const apiResponsePromise = yield call(
-      fetch,
-      `http://localhost:3000/api/users/me`
-    );
+    const apiResponsePromise = yield call(fetch, "/api/users/me");
 
     const data: { user: UserResponse | null } = yield apiResponsePromise.json();
 

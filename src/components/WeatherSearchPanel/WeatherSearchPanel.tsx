@@ -38,12 +38,7 @@ const WeatherSearchPanel: React.FC<WeatherSearchPanelProps> = ({
     setAreCitySuggestionsLoading(true);
 
     const data = await fetch(
-      `http://localhost:3000/api/weather/city-suggestions?query=${debouncedInput}`,
-      {
-        next: {
-          revalidate: 10,
-        },
-      }
+      `/api/weather/city-suggestions?query=${debouncedInput}`
     );
 
     const responseBody: Location[] = await data.json();

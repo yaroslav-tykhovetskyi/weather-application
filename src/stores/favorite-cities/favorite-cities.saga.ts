@@ -32,7 +32,7 @@ export function* fetchFavoriteCitiesSaga({
 
     const apiResponsePromise = yield call(
       fetch,
-      `http://localhost:3000/api/users/${payload}/favorite-cities`
+      `/api/users/${payload}/favorite-cities`
     );
 
     const data: FavoriteCitiesResponse = yield apiResponsePromise.json();
@@ -57,7 +57,7 @@ export function* saveFavoriteCitySaga({
 
     const apiResponsePromise = yield call(
       fetch,
-      `http://localhost:3000/api/users/${userId}/favorite-cities`,
+      `/api/users/${userId}/favorite-cities`,
       { method: "POST", body: JSON.stringify({ cityName }) }
     );
 
@@ -91,7 +91,7 @@ export function* removeFavoriteCitySaga({
 
     const apiResponsePromise = yield call(
       fetch,
-      `http://localhost:3000/api/users/${userId}/favorite-cities/${cityId}`,
+      `/api/users/${userId}/favorite-cities/${cityId}`,
       { method: "DELETE" }
     );
 

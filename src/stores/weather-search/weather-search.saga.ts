@@ -1,6 +1,6 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { FETCH_WEATHER_ACTION, FETCH_WEATHER_API_URL } from "./constants";
+import { FETCH_WEATHER_ACTION } from "./constants";
 import {
   setIsWeatherLoading,
   setSearchResults,
@@ -15,7 +15,7 @@ export function* fetchWeatherSaga({
 
     const apiResponsePromise = yield call(
       fetch,
-      `${FETCH_WEATHER_API_URL}?query=${payload}`
+      `/api/weather?query=${payload}`
     );
 
     const data = yield apiResponsePromise.json();

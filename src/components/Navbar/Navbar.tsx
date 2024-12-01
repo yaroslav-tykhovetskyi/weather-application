@@ -4,12 +4,13 @@ import { useAppSelector } from "@/stores/hooks";
 import Link from "next/link";
 import { selectIsUserLoading, selectUserEmail } from "@/stores/user/selectors";
 import { MdPerson } from "react-icons/md";
+import { useCallback } from "react";
 
 export default function Navbar() {
   const userEmail = useAppSelector(selectUserEmail);
   const isUserLoading = useAppSelector(selectIsUserLoading);
 
-  const renderUserSection = () => {
+  const renderUserSection = useCallback(() => {
     if (isUserLoading) {
       return (
         <div className="bg-white/50 py-2 px-5 rounded-2xl text-center">
@@ -46,7 +47,8 @@ export default function Navbar() {
         )}
       </div>
     );
-  };
+  }, [isUserLoading, userEmail]);
+
   return (
     <nav className="flex flex-row justify-between p-5 items-center">
       <Link className="text-white text-3xl italic font-bold truncate" href="/">

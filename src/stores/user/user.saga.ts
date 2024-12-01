@@ -10,15 +10,22 @@ export function* fetchUserSaga(): Generator<unknown, UserResponse | null> {
 
     const apiResponsePromise = yield call(fetch, "/api/users/me");
 
-    const data: { user: UserResponse | null } = yield apiResponsePromise.json();
-
-    if (data.user) {
-      yield put(setUser(data.user));
-      yield put(fetchFavoriteCities(data.user.id));
+    if (!apiResponsePromise.ok) {
+      throw new Error("Failed to fetch current user");
     }
 
-    return data.user || null;
-  } catch {
+    const { user }: { user: UserResponse | null } =
+      yield apiResponsePromise.json();
+
+    if (user) {
+      yield put(setUser(user));
+      yield put(fetchFavoriteCities(user.id));
+    }
+
+    return user || null;
+  } catch (error) {
+    // TODO: dispatch error
+    console.error("Error fetching user:", error);
   } finally {
     yield put(setIsUserLoading(false));
   }

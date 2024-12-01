@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 
 export default function RegistrationForm() {
   const router = useRouter();
@@ -14,33 +14,46 @@ export default function RegistrationForm() {
   const [isSubmitButtonDisabled, setIsSubmitButtonDisabled] =
     useState<boolean>(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitButtonDisabled(true);
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setIsSubmitButtonDisabled(true);
 
-    const formData = new FormData(e.currentTarget);
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      body: JSON.stringify({
-        email: formData.get("email"),
-        password: formData.get("password"),
-      }),
-    });
+      const formData = new FormData(e.currentTarget);
 
-    if (response.status === 409) {
-      setFormError("User with provided email already exists.");
-      setIsSubmitButtonDisabled(false);
-      return;
-    }
+      const email = formData.get("email");
+      const password = formData.get("password");
 
-    if (!response.ok) {
-      setFormError("An error occured while processing your request.");
-      setIsSubmitButtonDisabled(false);
-      return;
-    }
+      if (!email || !password) {
+        setFormError("Both email and password are required to register.");
+        setIsSubmitButtonDisabled(false);
+        return;
+      }
 
-    router.push("/auth/login");
-  };
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (response.status === 409) {
+        setFormError("User with provided email already exists.");
+        setIsSubmitButtonDisabled(false);
+        return;
+      }
+
+      if (!response.ok) {
+        setFormError("An error occured while processing your request.");
+        setIsSubmitButtonDisabled(false);
+        return;
+      }
+
+      router.push("/auth/login");
+    },
+    [router]
+  );
 
   return (
     <div className="flex flex-col items-center mt-10 gap-10">

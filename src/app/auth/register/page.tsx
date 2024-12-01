@@ -7,6 +7,7 @@ export default async function RegisterPage() {
 
   if (session) {
     redirect("/");
+    return null;
   }
 
   return <RegistrationForm />;

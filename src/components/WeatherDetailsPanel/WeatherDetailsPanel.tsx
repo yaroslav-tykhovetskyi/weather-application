@@ -72,7 +72,7 @@ const WeatherDetailsPanel = () => {
 
     if (!location) {
       setError(
-        "Required query parameter containing location was not provided,"
+        "Required query parameter containing location was not provided, could not load weather details"
       );
       return;
     }
@@ -80,15 +80,15 @@ const WeatherDetailsPanel = () => {
     dispatch(fetchWeather(location));
   }, [dispatch, searchParams]);
 
-  const handleAddFavoriteCity = () => {
+  const handleAddFavoriteCity = useCallback(() => {
     if (!userId || !fullLocationName) {
       return;
     }
 
     dispatch(saveFavoriteCity({ userId, cityName: fullLocationName }));
-  };
+  }, [userId, fullLocationName, dispatch]);
 
-  const handleRemoveFavoriteCity = () => {
+  const handleRemoveFavoriteCity = useCallback(() => {
     if (!userId || !fullLocationName) {
       return;
     }
@@ -98,7 +98,7 @@ const WeatherDetailsPanel = () => {
     )[0].id;
 
     dispatch(removeFavoriteCity({ userId, cityId: favoriteCityId }));
-  };
+  }, [userId, favoriteCities, fullLocationName, dispatch]);
 
   const renderFavoriteCityButton = () => {
     if (!userId) {
@@ -127,7 +127,11 @@ const WeatherDetailsPanel = () => {
   }, [dispatch, getWeatherData]);
 
   if (error) {
-    return <h1>{error}</h1>;
+    return (
+      <div className="flex flex-row justify-center text-center mt-20">
+        <h1 className=" max-w-[60%] text-2xl text-white">{error}</h1>
+      </div>
+    );
   }
 
   return (

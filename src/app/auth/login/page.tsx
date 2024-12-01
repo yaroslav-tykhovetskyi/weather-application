@@ -8,6 +8,7 @@ export default async function LoginPage() {
 
   if (serverSession) {
     redirect("/");
+    return null;
   }
 
   return <LoginForm />;

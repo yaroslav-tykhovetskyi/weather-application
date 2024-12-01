@@ -4,6 +4,7 @@ import {
 } from "@/stores/favorite-cities/selectors";
 import { useAppSelector } from "@/stores/hooks";
 import Link from "next/link";
+import { useCallback } from "react";
 
 const FavoriteCitiesSection = () => {
   const favoriteCities = useAppSelector(selectFavoriteCities);
@@ -32,7 +33,7 @@ const FavoriteCitiesSection = () => {
     );
   };
 
-  const renderFavoriteCitiesSkeletons = () => {
+  const renderFavoriteCitiesSkeletons = useCallback(() => {
     return (
       <>
         {[{}, {}, {}, {}, {}].map((item, index) => (
@@ -45,7 +46,7 @@ const FavoriteCitiesSection = () => {
         ))}
       </>
     );
-  };
+  }, []);
 
   return (
     <div>

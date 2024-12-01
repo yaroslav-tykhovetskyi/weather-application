@@ -11,21 +11,29 @@ export async function GET(
 ) {
   const { userId } = await params;
 
-  const favoriteCitiesFromDb: FavoriteCity[] =
-    await prisma.favoriteCity.findMany({
-      select: {
-        id: true,
-        cityName: true,
-      },
-      where: {
-        userId: userId,
-      },
-    });
+  try {
+    const favoriteCitiesFromDb: FavoriteCity[] =
+      await prisma.favoriteCity.findMany({
+        select: {
+          id: true,
+          cityName: true,
+        },
+        where: {
+          userId: userId,
+        },
+      });
 
-  return NextResponse.json<FavoriteCitiesResponse>(
-    { favoriteCities: favoriteCitiesFromDb },
-    { status: 200 }
-  );
+    return NextResponse.json<FavoriteCitiesResponse>(
+      { favoriteCities: favoriteCitiesFromDb },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error fetching favorite cities", error);
+    return NextResponse.json(
+      { error: "An error occurred while fetching favorite cities" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(
@@ -37,19 +45,28 @@ export async function POST(
 
   if (!cityName) {
     return NextResponse.json(
-      { errorMessage: "Missing required parameters to save favorite city" },
+      { error: "City name is required" },
       { status: 400 }
     );
   }
-  const savedCity = await prisma.favoriteCity.create({
-    data: {
-      cityName,
-      userId,
-    },
-  });
 
-  return NextResponse.json<FavoriteCity>(
-    { id: savedCity.id, cityName: savedCity.cityName },
-    { status: 200 }
-  );
+  try {
+    const savedCity = await prisma.favoriteCity.create({
+      data: {
+        cityName,
+        userId,
+      },
+    });
+
+    return NextResponse.json<FavoriteCity>(
+      { id: savedCity.id, cityName: savedCity.cityName },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error saving favorite city", error);
+    return NextResponse.json(
+      { error: "An error occurred while saving favorite city" },
+      { status: 500 }
+    );
+  }
 }

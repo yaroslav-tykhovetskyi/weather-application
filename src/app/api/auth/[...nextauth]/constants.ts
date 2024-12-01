@@ -13,41 +13,30 @@ export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials) {
-          return null;
-        }
-        // validate
+        if (!credentials) return null;
 
         const { email, password } = credentials;
-        // const email = credentials["email"];
-
         const userFromDb = await prisma.user.findUnique({
           where: {
             email,
           },
         });
-
-        if (!userFromDb) {
-          return null;
-        }
+        if (!userFromDb) return null;
 
         const isPasswordCorrect = await bcrypt.compare(
           password,
-          userFromDb.password || ""
+          userFromDb.password
         );
+        if (!isPasswordCorrect) return null;
 
-        if (isPasswordCorrect) {
-          return {
-            id: userFromDb.id,
-            email: userFromDb.email,
-          };
-        } else {
-          return null;
-        }
+        return {
+          id: userFromDb.id,
+          email: userFromDb.email,
+        };
       },
     }),
   ],

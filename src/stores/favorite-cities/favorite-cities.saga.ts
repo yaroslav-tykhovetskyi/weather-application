@@ -1,11 +1,4 @@
-import {
-  call,
-  CallEffect,
-  put,
-  PutEffect,
-  takeEvery,
-  takeLatest,
-} from "redux-saga/effects";
+import { call, put, takeEvery, takeLatest } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import {
   addFavoriteCity,
@@ -35,12 +28,18 @@ export function* fetchFavoriteCitiesSaga({
       `/api/users/${payload}/favorite-cities`
     );
 
+    if (!apiResponsePromise.ok) {
+      throw new Error("Failed to fetch favorite cities");
+    }
+
     const data: FavoriteCitiesResponse = yield apiResponsePromise.json();
 
     yield put(setFavoriteCities(data.favoriteCities));
 
     return data;
-  } catch {
+  } catch (error) {
+    // TODO: dispatch error
+    console.error("Error fetching favorite cities:", error);
   } finally {
     yield put(setAreFavoriteCitiesLoading(false));
   }
@@ -61,14 +60,18 @@ export function* saveFavoriteCitySaga({
       { method: "POST", body: JSON.stringify({ cityName }) }
     );
 
-    const data = yield apiResponsePromise.json();
-
-    if (apiResponsePromise.ok) {
-      yield put(addFavoriteCity(data));
+    if (!apiResponsePromise.ok) {
+      throw new Error("Failed to save favorite city");
     }
 
+    const data = yield apiResponsePromise.json();
+
+    yield put(addFavoriteCity(data));
+
     return data;
-  } catch {
+  } catch (error) {
+    // TODO: dispatch error
+    console.error("Error saving favorite city:", error);
   } finally {
     yield put(setAreFavoriteCitiesLoading(false));
   }
@@ -78,13 +81,7 @@ export function* saveFavoriteCitySaga({
 
 export function* removeFavoriteCitySaga({
   payload,
-}: PayloadAction<RemoveFavoriteCityDto>): Generator<
-  PutEffect | CallEffect,
-  FavoriteCitiesResponse | null,
-  // TODO: change any to current props
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any
-> {
+}: PayloadAction<RemoveFavoriteCityDto>): Generator<unknown> {
   try {
     const { userId, cityId } = payload;
     yield put(setAreFavoriteCitiesLoading(true));
@@ -95,14 +92,18 @@ export function* removeFavoriteCitySaga({
       { method: "DELETE" }
     );
 
-    const data = yield apiResponsePromise.json();
-
-    if (apiResponsePromise.ok) {
-      yield put(removeFavoriteCityById(cityId));
+    if (!apiResponsePromise.ok) {
+      throw new Error("Failed to remove favorite city");
     }
 
+    const data = yield apiResponsePromise.json();
+
+    yield put(removeFavoriteCityById(cityId));
+
     return data;
-  } catch {
+  } catch (error) {
+    // TODO: dispatch error
+    console.error("Error removing favorite city:", error);
   } finally {
     yield put(setAreFavoriteCitiesLoading(false));
   }

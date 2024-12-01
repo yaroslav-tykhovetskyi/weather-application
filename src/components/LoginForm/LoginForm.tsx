@@ -4,7 +4,7 @@ import { fetchUser } from "@/stores/user/user.slice";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
 
 export default function LoginForm() {
   const dispatch = useAppDispatch();
@@ -17,36 +17,53 @@ export default function LoginForm() {
   const [isSubmitButtonDisabled, setIsSubmitButtonDisabled] =
     useState<boolean>(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitButtonDisabled(true);
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setIsSubmitButtonDisabled(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
+      const formData = new FormData(e.currentTarget);
+      const email = formData.get("email");
+      const password = formData.get("password");
 
-    if (!email || !password) {
-      setFormError("Both email and password are required to login.");
-      setIsSubmitButtonDisabled(false);
-      return;
-    }
+      if (!email || !password) {
+        setFormError("Both email and password are required to login.");
+        setIsSubmitButtonDisabled(false);
+        return;
+      }
 
-    const authResponse = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+      const authResponse = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    if (!authResponse || authResponse.error) {
-      setFormError("Could not authenticate with provided credentials.");
-      setIsSubmitButtonDisabled(false);
-      return;
-    }
+      if (!authResponse || authResponse.error) {
+        setFormError("Could not authenticate with provided credentials.");
+        setIsSubmitButtonDisabled(false);
+        return;
+      }
 
-    dispatch(fetchUser());
-    router.push("/");
-    router.refresh();
-  };
+      dispatch(fetchUser());
+      router.push("/");
+      router.refresh();
+    },
+    [router, dispatch]
+  );
+
+  const handleEmailChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEmailInputValue(e.target.value);
+    },
+    []
+  );
+
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPasswordInputValue(e.target.value);
+    },
+    []
+  );
 
   return (
     <div className="flex flex-col items-center mt-10 gap-10">
@@ -64,7 +81,7 @@ export default function LoginForm() {
           }`}
           type="email"
           value={emailInputValue}
-          onChange={(e) => setEmailInputValue(e.target.value)}
+          onChange={handleEmailChange}
         />
         <label htmlFor="password-input">Password</label>
         <input
@@ -75,7 +92,7 @@ export default function LoginForm() {
           }`}
           type="password"
           value={passwordInputValue}
-          onChange={(e) => setPasswordInputValue(e.target.value)}
+          onChange={handlePasswordChange}
         />
         <button
           disabled={isSubmitButtonDisabled}

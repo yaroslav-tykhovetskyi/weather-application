@@ -25,12 +25,6 @@ export const weatherSearchSlice = createSlice({
       state.isFetching = false;
     },
 
-    setSearchResultsErrored: (state) => {
-      state.searchResults = undefined;
-      state.isError = true;
-      state.isFetching = false;
-    },
-
     clearWeatherSearchResults: (state) => {
       state.searchQuery = initialState.searchQuery;
       state.searchResults = initialState.searchResults;
@@ -46,6 +40,5 @@ export const {
   setIsWeatherLoading,
   setSearchResults,
   setSearchQuery,
-  setSearchResultsErrored,
   clearWeatherSearchResults,
 } = weatherSearchSlice.actions;

@@ -11,6 +11,8 @@ import { useDispatch } from "react-redux";
 import { setSearchQuery } from "@/stores/weather-search/weather-search.slice";
 import CitySuggestionsList from "../CitySuggestionsList/CitySuggestionsList";
 import { SEARCH_DEBOUNCE_TIMEOUT } from "./WeatherSearchPanel.constants";
+import { useCitySuggestions } from "@/hooks/useCitySuggestions/useCitySiggestions";
+import { formatFullLocationName } from "./WeatherSearchPanel.utils";
 
 const WeatherSearchPanel: React.FC<WeatherSearchPanelProps> = ({
   handleSearchClick,
@@ -24,46 +26,33 @@ const WeatherSearchPanel: React.FC<WeatherSearchPanelProps> = ({
   const [searchText, setSearchText] = useState<string>(searchQuery || "");
   const [isSuggestionsPanelShown, setIsSuggestionsPanelShown] =
     useState<boolean>(false);
-  const [areCitySuggestionsLoading, setAreCitySuggestionsLoading] =
-    useState<boolean>(false);
 
   const debouncedInput = useDebounce<string | null>(
     searchText,
     SEARCH_DEBOUNCE_TIMEOUT
   );
 
-  const [citySuggestions, setCitySuggestions] = useState<Location[]>([]);
+  const { citySuggestions, areCitySuggestionsLoading } =
+    useCitySuggestions(debouncedInput);
 
-  const fetchCitySuggestions = useCallback(async () => {
-    setAreCitySuggestionsLoading(true);
-
-    const data = await fetch(
-      `/api/weather/city-suggestions?query=${debouncedInput}`
-    );
-
-    const responseBody: Location[] = await data.json();
-
-    setCitySuggestions(responseBody);
-
-    setAreCitySuggestionsLoading(false);
-  }, [debouncedInput]);
-
-  const onInputChange = (newValue: string) => {
+  const onInputChange = useCallback((newValue: string) => {
     setSearchText(newValue);
-  };
+  }, []);
 
-  const onCitySuggestionPress = (clickedLocation: Location) => {
-    const searchQuery = `${clickedLocation.name}${
-      clickedLocation.region && `, ${clickedLocation.region}`
-    }${clickedLocation.country && `, ${clickedLocation.country}`}`;
+  const onCitySuggestionPress = useCallback((clickedLocation: Location) => {
+    const searchQuery = formatFullLocationName(
+      clickedLocation.name,
+      clickedLocation.region,
+      clickedLocation.country
+    );
 
     setSearchText(searchQuery);
     setIsSuggestionsPanelShown(false);
-  };
+  }, []);
 
-  const onSearchClick = () => {
+  const onSearchClick = useCallback(() => {
     handleSearchClick(debouncedInput);
-  };
+  }, [handleSearchClick, debouncedInput]);
 
   const renderCitySuggestions = () => {
     return (
@@ -79,11 +68,7 @@ const WeatherSearchPanel: React.FC<WeatherSearchPanelProps> = ({
     if (debouncedInput !== null) {
       dispatch(setSearchQuery(debouncedInput));
     }
-
-    if (debouncedInput && debouncedInput.length >= 3) {
-      fetchCitySuggestions();
-    }
-  }, [dispatch, fetchCitySuggestions, debouncedInput]);
+  }, [dispatch, debouncedInput]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

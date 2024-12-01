@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 export default function WeatherDetailsPage() {
   return (
-    <Suspense fallback={<h1>Loading details...</h1>}>
+    <Suspense>
       <WeatherDetailsPanel />
     </Suspense>
   );

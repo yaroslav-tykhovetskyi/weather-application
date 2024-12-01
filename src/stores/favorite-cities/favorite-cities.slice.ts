@@ -40,7 +40,6 @@ export const favoriteCitiesSlice = createSlice({
 
     clearFavoriteCitiesStore: (state) => {
       state.areFavoriteCitiesLoading = false;
-
       state.favoriteCities = initialState.favoriteCities;
     },
   },

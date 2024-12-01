@@ -29,3 +29,8 @@ To install dependencies, run the following command in your project directory:
 `yarn dev`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Explanation of technologies used:
+- State management: Redux + Redux Saga - I chose this because it's a solution that I'm familiar with and I've had good experiences with it in the past.
+- Caching Implementation - I used Next.JS revalidation mechanism set to false to cache city suggestions data, because it's data that does not change at all. For weather search, I used a simple in-memory cache that holds it for 10 minutes, because it's data that changes very often and I need to receive fresh data immediately after cache expiration. There are certainly better ways to handle caching, but because of lack of time and lack of experience with Next.JS caching solutions I wanted to keep it simple for this project.
+- ORM: Prisma - I chose Prisma because it's a modern ORM that is easy to configure and use, and it's certainly enough for this project.

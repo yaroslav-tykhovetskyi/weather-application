@@ -20,7 +20,7 @@ This will start the database service as defined in your `docker-compose.yml` fil
 
 ### Run database migrations
 
-To install dependencies, run the following command in your project directory:
+To run database migrations, run the following command in your project directory:
 
 `npx prisma migrate dev`
 
